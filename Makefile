@@ -21,7 +21,7 @@ clean:
 	find . -type d -name "*.egg-info" -exec rm -r {} +
 
 run:
-	python3 sentry.py
+	PYTHONPATH=. python3 -m app.main
 
 format:
 	black .

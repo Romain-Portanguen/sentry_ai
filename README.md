@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/assets/sentry.png" alt="Sentry AI Logo" width="500"/>
+  <img src="app/public/assets/sentry.png" alt="Sentry AI Logo" width="500"/>
 </div>
 
 # 🛡️ Sentry AI - Privacy Guardian
