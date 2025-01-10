@@ -64,15 +64,6 @@ Icon
 *.db
 
 # Application specific
-*.mp4
-*.avi
-*.mov
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.tiff
-*.bmp
 *.plist
 
 # Environment configuration
