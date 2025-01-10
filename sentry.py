@@ -124,7 +124,7 @@ def wait_for_unlock(cap=None):
 def main():
     global absence_timer
     resource_manager = ResourceManager()
-    
+
     try:
         while True:
             cap = start_camera()
@@ -141,7 +141,6 @@ def main():
 
                 if is_sleep_mode():
                     print("Sentry is in standby mode. Waiting for user activity... 💤")
-                    yield "sleep_mode"
                     break
 
                 if is_user_inactive():
@@ -186,10 +185,15 @@ def main():
         raise
     finally:
         resource_manager.cleanup()
-        if 'cap' in locals() and cap.isOpened():
+        if "cap" in locals() and cap.isOpened():
             cap.release()
         cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nSentry is shutting down... 🔴")
+    except Exception as e:
+        print(f"\nUnexpected error: {e}")
