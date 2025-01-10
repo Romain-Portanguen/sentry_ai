@@ -26,9 +26,28 @@ def lock_screen():
 
 def is_sleep_mode():
     """Check if the Mac enters sleep mode or shuts down."""
-    log = os.popen("pmset -g log | grep -E 'Entering Sleep|System Shutdown'").read()
-    return bool(log.strip())
+    try:
+        power_status = os.popen("pmset -g ps").read()
+        return 'sleep' in power_status.lower() or 'sleeping' in power_status.lower()
+    except:
+        return False
 
+
+def wait_for_wake(cap=None):
+    """Wait for the system to fully wake up."""
+    print("Sentry is in standby mode. Waiting for user activity... 💤")
+    
+    if cap and cap.isOpened():
+        cap.release()
+        cv2.destroyAllWindows()
+    
+    while True:
+        power_status = os.popen("pmset -g ps").read()
+        if 'AC Power' in power_status and not is_sleep_mode():
+            time.sleep(2)
+            print("System is active again! Resuming surveillance... ✨")
+            return True
+        time.sleep(1)
 
 def is_user_inactive():
     """Detect user inactivity via keyboard/mouse idle time."""
@@ -140,8 +159,9 @@ def main():
                 last_check_time = current_time
 
                 if is_sleep_mode():
-                    print("Sentry is in standby mode. Waiting for user activity... 💤")
-                    break
+                    if wait_for_wake():
+                        break
+                    continue
 
                 if is_user_inactive():
                     if resource_manager.camera_active:
