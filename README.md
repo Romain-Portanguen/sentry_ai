@@ -128,6 +128,10 @@ make test          # Run tests
 1. **Launch**
 
    ```bash
+   # Recommended method
+   make run
+
+   # Alternative method
    python3 sentry.py
    ```
 
