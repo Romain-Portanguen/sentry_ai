@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="public/assets/sentry.png" alt="Sentry AI Logo" width="500"/>
+</div>
+
 # 🛡️ Sentry AI - Privacy Guardian
 
 Sentry AI is an intelligent security application that automatically protects your privacy by locking your Mac when you step away from your workstation. Using artificial intelligence-based face detection, Sentry ensures discreet and efficient surveillance.
