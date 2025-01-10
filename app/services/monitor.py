@@ -1,10 +1,10 @@
 import asyncio
-import time
 from app.core.camera import Camera
 from app.core.face_detector import FaceDetector
 from app.core.system import SystemController
 from app.utils.config import Config
 from app.utils.logger import logger
+
 
 class SecurityMonitor:
     """Main security monitoring service that coordinates camera, face detection, and system control.
@@ -62,14 +62,16 @@ class SecurityMonitor:
                 continue
 
             if not self.camera.start():
-                logger.error("🔄 Camera initialization failed, retrying in 5 seconds...")
+                logger.error(
+                    "🔄 Camera initialization failed, retrying in 5 seconds..."
+                )
                 await asyncio.sleep(5)
                 if not self.running:
                     break
                 continue
 
             logger.info("👀 Sentry active - Monitoring for presence...")
-            
+
             try:
                 while self.running:
                     if self.system.is_sleep_mode():
@@ -93,7 +95,9 @@ class SecurityMonitor:
                             break
 
                     if self.system.is_user_inactive():
-                        logger.info("💤 User inactivity detected - Engaging security measures...")
+                        logger.info(
+                            "💤 User inactivity detected - Engaging security measures..."
+                        )
                         self.camera.release()
                         self.system.lock_screen()
                         while self.running and self.system.is_user_inactive():
@@ -113,10 +117,10 @@ class SecurityMonitor:
         """
         logger.info("💤 System entering sleep mode - Pausing operations...")
         self.camera.release()
-        
+
         while self.running and self.system.is_sleep_mode():
             await asyncio.sleep(1)
-        
+
         logger.info("⚡ System resumed from sleep - Reactivating surveillance...")
 
     async def _handle_absence(self):

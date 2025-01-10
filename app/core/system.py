@@ -2,6 +2,7 @@ import os
 import Quartz
 from app.utils.logger import logger
 
+
 class SystemController:
     """Controls and monitors system state and security actions.
 
@@ -9,7 +10,7 @@ class SystemController:
     - Monitoring system states (sleep, lock, user activity)
     - Controlling system security actions (screen locking)
     - Interfacing with macOS system APIs
-    
+
     It uses PyObjC bindings and system commands to interact with macOS,
     providing a reliable way to monitor and control system security states.
     """
@@ -45,7 +46,9 @@ class SystemController:
         """
         try:
             power_status = os.popen("pmset -g ps").read()
-            is_sleeping = 'sleep' in power_status.lower() or 'sleeping' in power_status.lower()
+            is_sleeping = (
+                "sleep" in power_status.lower() or "sleeping" in power_status.lower()
+            )
             if is_sleeping:
                 logger.debug("💤 System sleep state detected")
             return is_sleeping

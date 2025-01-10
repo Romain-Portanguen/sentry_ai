@@ -1,4 +1,5 @@
 import os
+
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 import asyncio
@@ -6,6 +7,7 @@ import signal
 from app.utils.config import Config
 from app.services.monitor import SecurityMonitor
 from app.utils.logger import logger
+
 
 async def main():
     """Initialize and run the Sentry security monitoring system.
@@ -22,10 +24,10 @@ async def main():
     logger.info("🚀 Initializing Sentry Security System...")
     config = Config()
     monitor = SecurityMonitor(config)
-    
+
     def signal_handler():
         """Handle interrupt signals for graceful shutdown.
-        
+
         This handler ensures that all resources are properly released
         and the application shuts down cleanly when interrupted.
         """
@@ -34,7 +36,7 @@ async def main():
 
     loop = asyncio.get_event_loop()
     loop.add_signal_handler(signal.SIGINT, signal_handler)
-    
+
     try:
         await monitor.monitor()
     except Exception as e:
@@ -42,6 +44,7 @@ async def main():
     finally:
         await monitor.stop()
         logger.info("✨ Sentry shutdown complete - Goodbye!")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

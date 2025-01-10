@@ -4,20 +4,23 @@ import numpy as np
 from app.utils.config import Config
 from app.utils.logger import logger
 
+
 @dataclass
 class Frame:
     """Represents a single frame captured from the camera.
-    
+
     Attributes:
         success (bool): Whether the frame was successfully captured
         image (np.ndarray): The actual image data, None if capture failed
     """
+
     success: bool
     image: np.ndarray = None
 
+
 class Camera:
     """Manages camera operations including initialization, capture, and cleanup.
-    
+
     This class handles all camera-related operations, including device initialization,
     frame capture, and proper resource cleanup. It uses OpenCV for camera operations
     and supports configuration of camera parameters.
@@ -36,6 +39,26 @@ class Camera:
         self.config = config
         self.device = None
 
+    def __enter__(self):
+        """Context manager entry.
+
+        Returns:
+            Camera: self for context manager usage
+        """
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit.
+
+        Ensures camera resources are properly released when exiting context.
+
+        Args:
+            exc_type: Exception type if an error occurred
+            exc_val: Exception value if an error occurred
+            exc_tb: Exception traceback if an error occurred
+        """
+        self.release()
+
     def start(self) -> bool:
         """Initialize and configure the camera device.
 
@@ -53,14 +76,14 @@ class Camera:
             logger.error("  • No other application is using the camera")
             logger.error("  • Camera is properly connected and functional")
             return False
-            
+
         self._configure()
         logger.info("📸 Camera initialized successfully")
         return True
 
     def _configure(self):
         """Configure camera properties according to settings.
-        
+
         Sets resolution and frame rate according to the configuration.
         These settings affect the quality and performance of the capture.
         """
@@ -84,7 +107,7 @@ class Camera:
 
     def release(self):
         """Release camera resources and cleanup.
-        
+
         This method should be called when the camera is no longer needed
         to ensure proper resource cleanup and allow other applications
         to access the camera.

@@ -3,12 +3,13 @@ import cv2
 import numpy as np
 from app.utils.config import Config
 
+
 class FaceDetector:
     def __init__(self, config: Config):
         self.config = config
         self.detector = mp.solutions.face_detection.FaceDetection(
             min_detection_confidence=config.FACE_CONFIDENCE,
-            model_selection=config.MODEL_SELECTION
+            model_selection=config.MODEL_SELECTION,
         )
 
     def detect(self, frame: np.ndarray) -> bool:
