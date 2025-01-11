@@ -1,4 +1,8 @@
 from setuptools import setup, find_packages
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ASSETS_PATH = os.path.join(BASE_DIR, 'app', 'public', 'assets')
 
 setup(
     name="sentry-ai",
@@ -8,13 +12,60 @@ setup(
         "opencv-python-headless>=4.8.0",
         "mediapipe>=0.10.0",
         "pyobjc-framework-Quartz>=9.0",
+        "rumps>=0.4.0",
     ],
     extras_require={
         "dev": [
             "pytest>=7.4.0",
             "black>=23.0.0",
             "flake8>=6.1.0",
+            "py2app>=0.28.0",
         ]
     },
     python_requires=">=3.10",
+    app=['app/main.py'],
+    data_files=[
+        ('assets', [
+            os.path.join(ASSETS_PATH, 'MenuBarIcon.png'),
+        ])
+    ],
+    options={
+        'py2app': {
+            'argv_emulation': False,
+            'packages': ['cv2', 'mediapipe', 'rumps'],
+            'includes': ['numpy', 'mediapipe', 'cv2', 'rumps'],
+            'excludes': [
+                'sitecustomize', 
+                'usercustomize', 
+                'site',
+                'pip', 
+                'setuptools',
+                'typing_extensions',
+                'pkg_resources',
+                '_distutils_hack'
+            ],
+            'resources': ['app/public/assets'],
+            'iconfile': os.path.join(ASSETS_PATH, 'AppIcon.png'),
+            'strip': False,
+            'optimize': 0,
+            'plist': {
+                'LSUIElement': False,
+                'CFBundleName': 'Sentry AI',
+                'CFBundleDisplayName': 'Sentry AI',
+                'CFBundleIdentifier': 'com.sentry.ai',
+                'CFBundleVersion': '1.0.0',
+                'CFBundleShortVersionString': '1.0.0',
+                'LSMinimumSystemVersion': '10.13',
+                'NSHighResolutionCapable': True,
+                'NSAppleEventsUsageDescription': 'This app needs to control other applications.',
+                'NSCameraUsageDescription': 'This app needs access to the camera for face detection.',
+                'NSMicrophoneUsageDescription': 'This app needs access to the microphone.',
+                'CFBundleDocumentTypes': [],
+                'CFBundleTypeRole': 'None',
+                'LSBackgroundOnly': False,
+                'NSSupportsAutomaticTermination': True,
+                'NSDockTilePlugIn': False,
+            }
+        }
+    }
 )

@@ -1,50 +1,170 @@
 import os
+import rumps
+import sys
+import threading
+import datetime
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 import asyncio
-import signal
 from app.utils.config import Config
 from app.services.monitor import SecurityMonitor
 from app.utils.logger import logger
+import subprocess
 
 
-async def main():
-    """Initialize and run the Sentry security monitoring system.
+def get_resource_path(relative_path):
+    """Get the correct path for resources, whether running as script or frozen app."""
+    if getattr(sys, "frozen", False):
+        bundle_dir = os.path.dirname(sys.executable)
+        resource_dir = os.path.join(bundle_dir, "..", "Resources")
+        return os.path.join(resource_dir, relative_path)
+    return os.path.join(os.path.dirname(__file__), relative_path)
 
-    This is the main entry point for the Sentry application. It:
-    1. Initializes the security monitor with configuration
-    2. Sets up signal handlers for graceful shutdown
-    3. Manages the main application lifecycle
-    4. Handles cleanup on exit
 
-    The application will continue running until interrupted by a signal
-    or an unhandled exception occurs.
-    """
-    logger.info("🚀 Initializing Sentry Security System...")
-    config = Config()
-    monitor = SecurityMonitor(config)
-
-    def signal_handler():
-        """Handle interrupt signals for graceful shutdown.
-
-        This handler ensures that all resources are properly released
-        and the application shuts down cleanly when interrupted.
-        """
-        logger.info("\n🛑 Interrupt received - Initiating graceful shutdown...")
-        asyncio.create_task(monitor.stop())
-
-    loop = asyncio.get_event_loop()
-    loop.add_signal_handler(signal.SIGINT, signal_handler)
-
+def run_async(coro):
+    """Executes a coroutine synchronously."""
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     try:
-        await monitor.monitor()
-    except Exception as e:
-        logger.error(f"❌ Critical error encountered: {e}")
+        return loop.run_until_complete(coro)
     finally:
-        await monitor.stop()
+        loop.close()
+
+
+def get_login_item_status():
+    """Check if the application is configured to start at login."""
+    cmd = [
+        "osascript",
+        "-e",
+        'tell application "System Events" to get the name of every login item',
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    return "Sentry AI" in result.stdout
+
+
+def toggle_login_item(enable):
+    """Enable or disable the automatic startup at login."""
+    if getattr(sys, "frozen", False):
+        app_path = os.path.abspath(
+            os.path.join(os.path.dirname(sys.executable), "../../..")
+        )
+        if enable:
+            cmd = [
+                "osascript",
+                "-e",
+                f'tell application "System Events" to make login item at end with properties {{path:"{app_path}", hidden:false}}',
+            ]
+        else:
+            cmd = [
+                "osascript",
+                "-e",
+                'tell application "System Events" to delete login item "Sentry AI"',
+            ]
+        subprocess.run(cmd)
+
+
+class SentryApp(rumps.App):
+    def __init__(self):
+        icon_path = get_resource_path("assets/MenuBarIcon.png")
+        super().__init__("Sentry AI", icon=icon_path, quit_button=None)
+        self.menu = [
+            rumps.MenuItem("Toggle Monitoring", callback=self.toggle_monitoring, key="m"),
+            None,
+            rumps.MenuItem("Launch at Login", callback=self.toggle_launch_at_login, key="l"),
+            None,
+            rumps.MenuItem("About", callback=self.about, key=","),
+            rumps.MenuItem("Quit", callback=self.quit, key="q"),
+        ]
+        self.monitor = None
+        self.monitor_thread = None
+        self._monitoring = False
+
+        self.update_monitoring_menu()
+        self.menu["Launch at Login"].state = get_login_item_status()
+
+    def update_monitoring_menu(self):
+        """Met à jour le texte du menu selon l'état du monitoring."""
+        menu_item = self.menu["Toggle Monitoring"]
+        menu_item.title = "Stop Monitoring" if self._monitoring else "Start Monitoring"
+
+    def toggle_monitoring(self, sender):
+        """Bascule entre démarrage et arrêt du monitoring."""
+        if self._monitoring:
+            self._monitoring = False
+            if self.monitor:
+                run_async(self.monitor.stop())
+        else:
+            self._monitoring = True
+            self.start_monitor_thread()
+        
+        self.update_monitoring_menu()
+
+    def start_monitor_thread(self):
+        """Start the monitor in a separate thread."""
+
+        def run_monitor():
+            run_async(self._start_monitoring())
+
+        self.monitor_thread = threading.Thread(target=run_monitor)
+        self.monitor_thread.start()
+
+    async def _start_monitoring(self):
+        try:
+            config = Config()
+            self.monitor = SecurityMonitor(config)
+            await self.monitor.monitor()
+        except Exception as e:
+            logger.error(f"❌ Error during monitoring: {e}")
+            self._monitoring = False
+            self.menu["Start Monitoring"].state = False
+            self.menu["Stop Monitoring"].state = True
+
+    def toggle_launch_at_login(self, sender):
+        sender.state = not sender.state
+        toggle_login_item(sender.state)
+
+    def about(self, _):
+        version = "1.0.0"
+        github_url = "https://github.com/Romain-Portanguen/sentry_ai"
+        about_text = f"""Sentry AI - Security Monitoring System
+Version: {version}
+
+A powerful AI-powered security monitoring system that uses computer vision to detect and track faces, providing real-time alerts and monitoring capabilities.
+
+Features:
+• Real-time face detection
+• Menu bar integration
+• Automatic startup option
+• Keyboard shortcuts
+
+Shortcuts:
+⌘M - Toggle Monitoring
+⌘L - Toggle Launch at Login
+⌘, - About
+⌘Q - Quit
+
+© {datetime.datetime.now().year} Sentry AI. All rights reserved.
+{github_url}
+"""
+        rumps.alert(title="About Sentry AI", message=about_text, ok="OK")
+
+    def quit(self, _):
+        if self._monitoring:
+            run_async(self.cleanup())
+        rumps.quit_application()
+
+    async def cleanup(self):
+        """Clean up resources before quitting."""
+        if self.monitor:
+            await self.monitor.stop()
         logger.info("✨ Sentry shutdown complete - Goodbye!")
 
 
+def main():
+    app = SentryApp()
+    app.run()
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
