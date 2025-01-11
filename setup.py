@@ -64,6 +64,7 @@ setup(
                 'LSMinimumSystemVersion': '10.13',
                 'NSHighResolutionCapable': True,
                 'NSAppleEventsUsageDescription': 'This app needs to control other applications.',
+                'NSSystemAdministrationUsageDescription': 'This app needs to manage startup items.',
                 'NSCameraUsageDescription': 'This app needs access to the camera for face detection.',
                 'NSMicrophoneUsageDescription': 'This app needs access to the microphone.',
                 'CFBundleDocumentTypes': [],
@@ -71,6 +72,10 @@ setup(
                 'LSBackgroundOnly': False,
                 'NSSupportsAutomaticTermination': True,
                 'NSDockTilePlugIn': False,
+                'com.apple.security.automation.apple-events': True,
+                'com.apple.security.temporary-exception.apple-events': [
+                    'com.apple.systemevents'
+                ]
             }
         }
     }
