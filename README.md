@@ -97,6 +97,20 @@ make build-mac     # 🔨 Dev build
 make build-mac-release  # 📦 Production build
 ```
 
+### 📦 Build & Distribution
+
+```bash
+# Create standalone app
+make build-mac-release
+
+# Create DMG for distribution
+make create-dmg
+
+# Find in:
+# - App: dist/Sentry AI.app
+# - DMG: dist/Sentry AI.dmg
+```
+
 ## 🔧 Setup Guide
 
 ### 📸 Camera Access
