@@ -66,16 +66,26 @@ Sentry AI is your intelligent workstation guardian that automatically protects y
 - Python 3.10
 - Camera access permissions
 
-### ⚡️ Quick Install
+### 🔐 macOS Installation
+
+### Option 1: Install from Source
 
 ```bash
-# Get the code
 git clone https://github.com/Romain-Portanguen/sentry_ai.git
 cd sentry_ai
-
-# Install & Run
 make install && source .venv/bin/activate && make run
 ```
+
+### Option 2: Install Pre-built Application
+
+1. Download the latest release from [GitHub Releases](https://github.com/Romain-Portanguen/sentry_ai/releases)
+2. Open the DMG file
+3. Drag the application to your Applications folder
+4. On first launch:
+   - Control+Click (or right-click) on the application
+   - Select "Open"
+   - Click "Open" in the dialog
+   - This step is only needed once
 
 ### 📦 Build Native App
 
@@ -162,3 +172,36 @@ This project is protected under the MIT License. See [`LICENSE`](LICENSE) for de
 ## 🤝 Contributing
 
 Your contributions make Sentry AI better! Check our [contribution guidelines](CONTRIBUTING.md) to get started.
+
+## ⚠️ macOS Security Note
+
+Sentry AI is an open-source application not signed by Apple. macOS will display a warning on first launch. This is normal and you can safely bypass this warning because:
+
+- The source code is fully public and verifiable
+- The application doesn't require privileged system access
+- All dependencies are open-source and verified
+
+To launch the application:
+
+1. When you first try to open the app, you'll see a warning
+2. Go to System Settings > Privacy & Security
+3. Scroll down to the Security section
+4. You should see a message about "Sentry AI" being blocked
+5. Click "Open Anyway"
+6. In the confirmation dialog, click "Open"
+
+This procedure is only necessary on first launch.
+
+### Why this warning appears?
+
+This warning appears because the application is not signed with an Apple Developer certificate. We keep the application unsigned to:
+
+- Maintain complete transparency
+- Keep the project fully open-source
+- Avoid additional costs that would be passed to users
+
+The application is completely safe to use, and you can verify this by:
+
+- Reviewing our [source code on GitHub](https://github.com/Romain-Portanguen/sentry_ai)
+- Building the application yourself from source
+- Scanning the application with your antivirus software
