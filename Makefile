@@ -1,4 +1,4 @@
-.PHONY: clean install install-dev test lint format run build-mac build-mac-release clean-all
+.PHONY: clean install install-dev test lint format run build-mac build-mac-release clean-all create-dmg
 
 clean:
 	rm -rf build dist *.egg-info app/*.egg-info
@@ -51,5 +51,22 @@ build-mac-release:
 	fi
 	@echo "Standalone application created in dist/Sentry AI.app"
 
+create-dmg: build-mac-release
+	@echo "Creating DMG..."
+	@rm -f "dist/Sentry AI.dmg"
+	@create-dmg \
+		--volname "Sentry AI" \
+		--volicon "app/public/assets/AppIcon.png" \
+		--background "app/public/assets/dmg-background.png" \
+		--window-pos 200 120 \
+		--window-size 800 400 \
+		--icon-size 100 \
+		--icon "Sentry AI.app" 200 190 \
+		--hide-extension "Sentry AI.app" \
+		--app-drop-link 600 185 \
+		"dist/Sentry AI.dmg" \
+		"dist/Sentry AI.app"
+	@echo "DMG created at dist/Sentry AI.dmg"
+
 run-app:
-	./dist/Sentry\ AI.app/Contents/MacOS/Sentry\ AI 
+	./dist/Sentry\ AI.app/Contents/MacOS/Sentry\ AI
