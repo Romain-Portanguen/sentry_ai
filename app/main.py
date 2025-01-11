@@ -66,22 +66,32 @@ def toggle_login_item(enable):
 
 class SentryApp(rumps.App):
     def __init__(self):
-        icon_path = get_resource_path("assets/MenuBarIcon.png")
-        super().__init__("Sentry AI", icon=icon_path, quit_button=None)
-        self.menu = [
-            rumps.MenuItem("Toggle Monitoring", callback=self.toggle_monitoring, key="m"),
-            None,
-            rumps.MenuItem("Launch at Login", callback=self.toggle_launch_at_login, key="l"),
-            None,
-            rumps.MenuItem("About", callback=self.about, key=","),
-            rumps.MenuItem("Quit", callback=self.quit, key="q"),
-        ]
-        self.monitor = None
-        self.monitor_thread = None
-        self._monitoring = False
+        try:
+            icon_path = os.path.join(os.path.dirname(__file__), "public", "assets", "MenuBarIcon.png")
+            logger.info(f"Loading icon from: {icon_path}")
+            if not os.path.exists(icon_path):
+                logger.error(f"Icon file not found at: {icon_path}")
+                raise FileNotFoundError(f"Icon file not found: {icon_path}")
+                
+            super().__init__("Sentry AI", icon=icon_path, quit_button=None)
+            logger.info("SentryApp initialized successfully")
+            self.menu = [
+                rumps.MenuItem("Toggle Monitoring", callback=self.toggle_monitoring, key="m"),
+                None,
+                rumps.MenuItem("Launch at Login", callback=self.toggle_launch_at_login, key="l"),
+                None,
+                rumps.MenuItem("About", callback=self.about, key=","),
+                rumps.MenuItem("Quit", callback=self.quit, key="q"),
+            ]
+            self.monitor = None
+            self.monitor_thread = None
+            self._monitoring = False
 
-        self.update_monitoring_menu()
-        self.menu["Launch at Login"].state = get_login_item_status()
+            self.update_monitoring_menu()
+            self.menu["Launch at Login"].state = get_login_item_status()
+        except Exception as e:
+            logger.error(f"Error initializing SentryApp: {e}")
+            raise
 
     def update_monitoring_menu(self):
         """Met à jour le texte du menu selon l'état du monitoring."""
@@ -162,8 +172,14 @@ Shortcuts:
 
 
 def main():
-    app = SentryApp()
-    app.run()
+    try:
+        logger.info("Starting Sentry AI application...")
+        app = SentryApp()
+        logger.info("Initialized SentryApp, starting main loop...")
+        app.run()
+    except Exception as e:
+        logger.error(f"Failed to start application: {e}")
+        raise
 
 
 if __name__ == "__main__":
