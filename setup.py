@@ -25,8 +25,9 @@ setup(
     python_requires=">=3.10",
     app=['app/main.py'],
     data_files=[
-        ('assets', [
+        ('app/public/assets', [
             os.path.join(ASSETS_PATH, 'MenuBarIcon.png'),
+            os.path.join(ASSETS_PATH, 'AppIcon.png')
         ])
     ],
     options={
@@ -44,7 +45,12 @@ setup(
                 'pkg_resources',
                 '_distutils_hack'
             ],
-            'resources': ['app/public/assets'],
+            'resources': [
+                ('app/public/assets', [
+                    os.path.join(ASSETS_PATH, 'MenuBarIcon.png'),
+                    os.path.join(ASSETS_PATH, 'AppIcon.png')
+                ])
+            ],
             'iconfile': os.path.join(ASSETS_PATH, 'AppIcon.png'),
             'strip': False,
             'optimize': 0,
