@@ -82,9 +82,9 @@ make install && source .venv/bin/activate && make run
 2. Open the DMG file
 3. Drag the application to your Applications folder
 4. On first launch:
-   - Control+Click (or right-click) on the application
-   - Select "Open"
-   - Click "Open" in the dialog
+   - You should see a message about "SentryAI" being blocked
+   - Click "Open Anyway"
+   - In the confirmation dialog, click "Open"
    - This step is only needed once
 
 ### 📦 Build Native App

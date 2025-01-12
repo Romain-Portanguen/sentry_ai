@@ -67,22 +67,31 @@ def toggle_login_item(enable):
 class SentryApp(rumps.App):
     def __init__(self):
         print("Starting Sentry AI application...")
-        icon_path = get_resource_path('app/public/assets/MenuBarIcon.png')
+        icon_path = get_resource_path("app/public/assets/MenuBarIcon.icns")
         print(f"Loading icon from: {icon_path}")
         if not os.path.exists(icon_path):
             logger.error(f"Icon file not found at: {icon_path}")
             raise FileNotFoundError(f"Icon file not found: {icon_path}")
-                
-        super().__init__("Sentry AI", icon=icon_path, quit_button=None)
+
+        super().__init__(
+            "SentryAI", icon=icon_path, quit_button=None, template=False, title=None
+        )
+
         logger.info("SentryApp initialized successfully")
+
         self.menu = [
-            rumps.MenuItem("Toggle Monitoring", callback=self.toggle_monitoring, key="m"),
+            rumps.MenuItem(
+                "Toggle Monitoring", callback=self.toggle_monitoring, key="m"
+            ),
             None,
-            rumps.MenuItem("Launch at Login", callback=self.toggle_launch_at_login, key="l"),
+            rumps.MenuItem(
+                "Launch at Login", callback=self.toggle_launch_at_login, key="l"
+            ),
             None,
             rumps.MenuItem("About", callback=self.about, key=","),
             rumps.MenuItem("Quit", callback=self.quit, key="q"),
         ]
+
         self.monitor = None
         self.monitor_thread = None
         self._monitoring = False
@@ -91,12 +100,12 @@ class SentryApp(rumps.App):
         self.menu["Launch at Login"].state = get_login_item_status()
 
     def update_monitoring_menu(self):
-        """Met à jour le texte du menu selon l'état du monitoring."""
+        """Updates the menu text based on monitoring state."""
         menu_item = self.menu["Toggle Monitoring"]
         menu_item.title = "Stop Monitoring" if self._monitoring else "Start Monitoring"
 
     def toggle_monitoring(self, sender):
-        """Bascule entre démarrage et arrêt du monitoring."""
+        """Toggles between starting and stopping monitoring."""
         if self._monitoring:
             self._monitoring = False
             if self.monitor:
@@ -104,11 +113,11 @@ class SentryApp(rumps.App):
         else:
             self._monitoring = True
             self.start_monitor_thread()
-        
+
         self.update_monitoring_menu()
 
     def start_monitor_thread(self):
-        """Start the monitor in a separate thread."""
+        """Starts the monitor in a separate thread."""
 
         def run_monitor():
             run_async(self._start_monitoring())
@@ -117,6 +126,7 @@ class SentryApp(rumps.App):
         self.monitor_thread.start()
 
     async def _start_monitoring(self):
+        """Starts monitoring with current configuration."""
         try:
             config = Config()
             self.monitor = SecurityMonitor(config)
@@ -128,6 +138,7 @@ class SentryApp(rumps.App):
             self.menu["Stop Monitoring"].state = True
 
     def toggle_launch_at_login(self, sender):
+        """Toggles launch at login setting."""
         sender.state = not sender.state
         toggle_login_item(sender.state)
 
@@ -162,7 +173,7 @@ Shortcuts:
         rumps.quit_application()
 
     async def cleanup(self):
-        """Clean up resources before quitting."""
+        """Cleans up resources before quitting."""
         if self.monitor:
             await self.monitor.stop()
         logger.info("✨ Sentry shutdown complete - Goodbye!")

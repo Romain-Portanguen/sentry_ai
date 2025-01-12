@@ -45,38 +45,37 @@ build-mac-release:
 	$(MAKE) clean-all
 	$(MAKE) install-dev
 	. .venv/bin/activate && python setup.py py2app
-	@if [ ! -d "dist/Sentry AI.app" ]; then \
-		echo "Error: Application build failed. dist/Sentry AI.app not found"; \
+	@if [ ! -d "dist/SentryAI.app" ]; then \
+		echo "Error: Application build failed. dist/SentryAI.app not found"; \
 		exit 1; \
 	fi
 	@echo "Removing problematic library: liblzma.5.dylib"
-	@rm -f "dist/Sentry AI.app/Contents/Frameworks/liblzma.5.dylib"
+	@rm -f "dist/SentryAI.app/Contents/Frameworks/liblzma.5.dylib"
 	@echo "Signing application..."
-	@find "dist/Sentry AI.app" \( -name "Python" -o -name "*.dylib" -o -name "*.so" \) \
+	@find "dist/SentryAI.app" \( -name "Python" -o -name "*.dylib" -o -name "*.so" \) \
 		-exec codesign --force --sign - --entitlements entitlements.plist --preserve-metadata=identifier,flags,runtime --timestamp=none {} +
-	@find "dist/Sentry AI.app/Contents/Frameworks" -type d -name "*.framework" \
+	@find "dist/SentryAI.app/Contents/Frameworks" -type d -name "*.framework" \
 		-exec codesign --force --deep --sign - --entitlements entitlements.plist --preserve-metadata=identifier,flags,runtime --timestamp=none {} +
-	@codesign --force --sign - --entitlements entitlements.plist --preserve-metadata=identifier,flags,runtime --timestamp=none --no-strict "dist/Sentry AI.app"
-	@echo "Standalone application created in dist/Sentry AI.app"
+	@codesign --force --sign - --entitlements entitlements.plist --preserve-metadata=identifier,flags,runtime --timestamp=none --no-strict "dist/SentryAI.app"
+	@echo "Standalone application created in dist/SentryAI.app"
 
 create-dmg: build-mac-release
 	@echo "Creating DMG..."
-	@rm -f "dist/Sentry AI.dmg"
+	@rm -f "dist/SentryAI.dmg"
 	@create-dmg \
-		--volname "Sentry AI" \
+		--volname "SentryAI" \
 		--volicon "app/public/assets/AppIcon.png" \
-		--background "app/public/assets/dmg-background.png" \
 		--window-pos 200 120 \
 		--window-size 800 400 \
 		--icon-size 100 \
-		--icon "Sentry AI.app" 200 190 \
-		--hide-extension "Sentry AI.app" \
+		--icon "SentryAI.app" 200 190 \
+		--hide-extension "SentryAI.app" \
 		--app-drop-link 600 185 \
-		"dist/Sentry AI.dmg" \
-		"dist/Sentry AI.app"
+		"dist/SentryAI.dmg" \
+		"dist/SentryAI.app"
 	@echo "Signing DMG..."
-	@codesign --force --sign - --preserve-metadata=identifier,entitlements,flags,runtime --timestamp=none --no-strict "dist/Sentry AI.dmg"
-	@echo "DMG created at dist/Sentry AI.dmg"
+	@codesign --force --sign - --preserve-metadata=identifier,entitlements,flags,runtime --timestamp=none --no-strict "dist/SentryAI.dmg"
+	@echo "DMG created at dist/SentryAI.dmg"
 
 run-app:
-	./dist/Sentry\ AI.app/Contents/MacOS/Sentry\ AI
+	./dist/SentryAI.app/Contents/MacOS/SentryAI

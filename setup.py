@@ -26,7 +26,7 @@ setup(
     app=['app/main.py'],
     data_files=[
         ('app/public/assets', [
-            os.path.join(ASSETS_PATH, 'MenuBarIcon.png'),
+            os.path.join(ASSETS_PATH, 'MenuBarIcon.icns'),
             os.path.join(ASSETS_PATH, 'AppIcon.png')
         ])
     ],
@@ -47,7 +47,7 @@ setup(
             ],
             'resources': [
                 ('app/public/assets', [
-                    os.path.join(ASSETS_PATH, 'MenuBarIcon.png'),
+                    os.path.join(ASSETS_PATH, 'MenuBarIcon.icns'),
                     os.path.join(ASSETS_PATH, 'AppIcon.png')
                 ])
             ],
@@ -55,21 +55,21 @@ setup(
             'strip': False,
             'optimize': 0,
             'plist': {
-                'LSUIElement': False,
-                'CFBundleName': 'Sentry AI',
-                'CFBundleDisplayName': 'Sentry AI',
+                'LSUIElement': True,
+                'CFBundleName': 'SentryAI',
+                'CFBundleDisplayName': 'SentryAI',
                 'CFBundleIdentifier': 'com.sentry.ai',
                 'CFBundleVersion': '1.0.0',
                 'CFBundleShortVersionString': '1.0.0',
                 'LSMinimumSystemVersion': '10.13',
                 'NSHighResolutionCapable': True,
+                'LSMultipleInstancesProhibited': True,
                 'NSAppleEventsUsageDescription': 'This app needs to control other applications.',
                 'NSSystemAdministrationUsageDescription': 'This app needs to manage startup items.',
                 'NSCameraUsageDescription': 'This app needs access to the camera for face detection.',
-                'NSMicrophoneUsageDescription': 'This app needs access to the microphone.',
                 'CFBundleDocumentTypes': [],
                 'CFBundleTypeRole': 'None',
-                'LSBackgroundOnly': False,
+                'LSBackgroundOnly': True,
                 'NSSupportsAutomaticTermination': True,
                 'NSDockTilePlugIn': False,
                 'com.apple.security.automation.apple-events': True,
